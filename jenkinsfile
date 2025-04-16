@@ -6,13 +6,13 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'myeflyer'
     }
 
-    stages {
+ /*   stages {
         stage('Cloner le repo') {
             steps {
-                git 'https://myeflyer.git'
+                git 'https://github.com/cynthia783/myeflyer.git'
             }
         }
-
+*/
         stage('Build Docker Image') {
             steps {
                 script {
@@ -50,3 +50,4 @@ pipeline {
         }
     }
 }
+def dockerImage
