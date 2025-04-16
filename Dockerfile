@@ -5,4 +5,4 @@ FROM httpd:latest
 COPY ./eflyer/ /usr/local/apache2/htdocs/
 
 # Exposer le port 80 pour que l'Apache soit accessible
-EXPOSE 8000:80
+EXPOSE 8001:80
