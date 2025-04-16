@@ -6,12 +6,16 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'myeflyer'
     }
 
+    tools {
+        docker 'docker'  // Assure-toi que 'docker' est bien installé sur Jenkins.
+    }
+
     stages {
-        /*stage('Cloner le repo') {
+        stage('Cloner le repo') {
             steps {
                 git 'https://github.com/cynthia783/myeflyer.git'
             }
-        }*/
+        }
 
         stage('Build Docker Image') {
             steps {
@@ -50,4 +54,3 @@ pipeline {
         }
     }
 }
-def dockerImage
