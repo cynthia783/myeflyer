@@ -5,16 +5,18 @@ pipeline {
         DOCKER_IMAGE = 'cynthia783/myeflyer'
         DOCKER_CREDENTIALS_ID = 'myeflyer'
         SONARQUBE = 'SonarQube'  // Nom du serveur SonarQube configuré dans Jenkins
-        SONARQUBE_SCANNER = 'SonarQube Scanner'  // Nom du scanner SonarQube configuré dans Jenkins
+        SONARQUBE_SCANNER = 'sonarqube-scanner'  // Nom du scanner SonarQube configuré dans Jenkins
+        SONAR_TOKEN = credentials('SONAR-TOKEN')
     }
 
     tools {
         dockerTool 'Docker'  // Assure-toi que 'docker' est bien installé sur Jenkins.
-    }
-
-    tools {
         dependencyCheck 'DP-Check'
     }
+
+    /*tools {
+        dependencyCheck 'DP-Check'
+    }*/
 
     stages {
         stage('Cloner le repo') {
