@@ -4,9 +4,9 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'cynthia783/myeflyer'
         DOCKER_CREDENTIALS_ID = 'myeflyer'
-        SONARQUBE = 'SonarQube'  // Nom du serveur SonarQube configuré dans Jenkins
+        SONARQUBE = 'sonarqube'  // Nom du serveur SonarQube configuré dans Jenkins
         SONARQUBE_SCANNER = 'sonarqube-scanner'  // Nom du scanner SonarQube configuré dans Jenkins
-        SONAR_TOKEN = credentials('SONAR-TOKEN')
+        SONAR_TOKEN = credentials('sonar-token')
     }
 
     tools {
@@ -101,8 +101,10 @@ pipeline {
     }
 
     post {
-        always {
+    always {
+        node {
             cleanWs()
         }
     }
 }
+
