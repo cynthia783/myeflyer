@@ -13,10 +13,6 @@ pipeline {
         dockerTool 'Docker'  // Assure-toi que 'docker' est bien installé sur Jenkins.
     }
 
-    /*tools {
-        dependencyCheck 'DP-Check'
-    }*/
-
     stages {
         stage('Cloner le repo') {
             steps {
