@@ -11,7 +11,7 @@ pipeline {
 
     tools {
         dockerTool 'Docker'  // Assure-toi que 'docker' est bien installé sur Jenkins.
-        dependencyCheck 'DP-Check'
+        DependencyCheck 'Dependency-Check'
     }
 
     stages {
@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     // Utiliser l'outil Dependency-Check configuré dans Jenkins
-                    def depCheckHome = tool name: 'DP-Check', type: 'org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation'
+                    def depCheckHome = tool name: 'Dependency-Check', type: 'org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation'
                     echo "Dependency-Check installé ici : ${depCheckHome}"
 
                     // Lancer le scan Dependency-Check
