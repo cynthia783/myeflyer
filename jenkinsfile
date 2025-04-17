@@ -30,7 +30,7 @@ pipeline {
             }
         }
 
-    // === SÉCURITÉ - Scans ===
+    // SÉCURITÉ - Scans
 
         stage('OWASP FS SCAN') {
             steps {
