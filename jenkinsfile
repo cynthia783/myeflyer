@@ -11,6 +11,7 @@ pipeline {
 
     tools {
         dockerTool 'Docker'  // Assure-toi que 'docker' est bien installé sur Jenkins.
+        dependencyCheck 'DP-Check'
     }
 
     stages {
@@ -33,6 +34,10 @@ pipeline {
 
         stage('OWASP FS SCAN') {
             steps {
+                script {
+                    def depCheckHome = tool name: 'DP-Check', type: 'org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation'
+                    echo "Dependency-Check installé ici : ${depCheckHome}"
+                }
                 dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
