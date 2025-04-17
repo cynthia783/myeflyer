@@ -8,6 +8,7 @@ pipeline {
 
     tools {
         dockerTool 'Docker'  // Assurez-vous que 'docker' est bien installé sur Jenkins
+        git 'default'
     }
 
     stages {
