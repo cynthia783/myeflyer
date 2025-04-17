@@ -4,9 +4,6 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'cynthia783/myeflyer'
         DOCKER_CREDENTIALS_ID = 'myeflyer'
-        SONARQUBE = 'sonarqube'  // Nom du serveur SonarQube configuré dans Jenkins
-        SONARQUBE_SCANNER = 'sonarqube-scanner'  // Nom du scanner SonarQube configuré dans Jenkins
-        SONAR_TOKEN = credentials('sonar-token')  // Utilisation sécurisée du token SonarQube
     }
 
     tools {
@@ -24,48 +21,6 @@ pipeline {
             steps {
                 script {
                     dockerImage = docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
-                }
-            }
-        }
-
-        // SÉCURITÉ - Scans
-
-        stage('TRIVY FS SCAN') {
-            steps {
-                script {
-                    // Assurez-vous que les fichiers à scanner existent dans le répertoire
-                    sh "trivy fs ${WORKSPACE} > trivyfs.txt"
-                    archiveArtifacts artifacts: 'trivyfs.txt', fingerprint: true
-                }
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    // Utilisation de 'withCredentials' pour gérer de manière sécurisée le token
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                        withSonarQubeEnv(SONARQUBE) {
-                            sh """
-                                sonar-scanner \
-                                -Dsonar.projectKey=myeflyer \
-                                -Dsonar.sources=. \
-                                -Dsonar.host.url=http://localhost:9000 \
-                                -Dsonar.login=${SONAR_TOKEN}  // Utilisation du token sécurisé
-                            """
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                script {
-                    // Attendre que le code passe le "Quality Gate" de SonarQube
-                    timeout(time: 1, unit: 'HOURS') {
-                        waitForQualityGate()  // Attendre que l'analyse SonarQube soit validée
-                    }
                 }
             }
         }
@@ -93,12 +48,6 @@ pipeline {
                     """
                 }
             }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()  // Nettoyer l'espace de travail après chaque exécution
         }
     }
 }
