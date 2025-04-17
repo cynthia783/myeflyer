@@ -10,7 +10,6 @@ pipeline {
 
     tools {
         dockerTool 'Docker'  // Assure-toi que 'docker' est bien installé sur Jenkins.
-        dependencyCheck name: 'dependency-check' // Le nom de l'outil tel qu'il est configuré dans Jenkins
     }
 
     stages {
