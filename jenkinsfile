@@ -48,7 +48,7 @@ pipeline {
                                 -Dsonar.projectKey=myeflyer \
                                 -Dsonar.sources=. \
                                 -Dsonar.host.url=http://localhost:9000 \
-                                -Dsonar.login=${SONAR_TOKEN}  // Utilise ton token d'authentification
+                                -Dsonar.login=${env.SONAR_TOKEN}  // Utilise ton token d'authentification
                             """
                         }
                     }
