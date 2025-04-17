@@ -35,14 +35,17 @@ pipeline {
         stage('OWASP FS SCAN') {
             steps {
                 script {
-                    // Utilisation de DependencyCheck sans l'ajouter dans 'tools'
+                    // Utiliser l'outil Dependency-Check configuré dans Jenkins
                     def depCheckHome = tool name: 'DP-Check', type: 'org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation'
                     echo "Dependency-Check installé ici : ${depCheckHome}"
-                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+
+                    // Lancer le scan Dependency-Check
+                    sh "${depCheckHome}/bin/dependency-check.sh --scan . --disableYarnAudit --disableNodeAudit"
                 }
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
+
         stage('TRIVY FS SCAN') {
             steps {
                 sh "trivy fs . > trivyfs.txt"
