@@ -6,18 +6,17 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'myeflyer'
         SONARQUBE = 'sonarqube'  // Nom du serveur SonarQube configuré dans Jenkins
         SONARQUBE_SCANNER = 'sonarqube-scanner'  // Nom du scanner SonarQube configuré dans Jenkins
-        SONAR_TOKEN = credentials('sonar-token')
+        SONAR_TOKEN = credentials('sonar-token')  // Utilisation sécurisée du token SonarQube
     }
 
     tools {
-        dockerTool 'Docker'  // Assure-toi que 'docker' est bien installé sur Jenkins.
+        dockerTool 'Docker'  // Assurez-vous que 'docker' est bien installé sur Jenkins
     }
 
     stages {
         stage('Cloner le repo') {
             steps {
                 git branch: 'main', url: 'https://github.com/cynthia783/myeflyer.git'
-
             }
         }
 
@@ -29,49 +28,54 @@ pipeline {
             }
         }
 
-    // SÉCURITÉ - Scans
+        // SÉCURITÉ - Scans
 
         stage('TRIVY FS SCAN') {
             steps {
-                sh "trivy fs . > trivyfs.txt"
-                archiveArtifacts artifacts: 'trivyfs.txt', fingerprint: true
+                script {
+                    // Assurez-vous que les fichiers à scanner existent dans le répertoire
+                    sh "trivy fs . > trivyfs.txt"
+                    archiveArtifacts artifacts: 'trivyfs.txt', fingerprint: true
+                }
             }
-        }    
-    
+        }
+
         stage('SonarQube Analysis') {
-                steps {
-                    script {
-                        // Lancer l'analyse SonarQube sur ton code source
+            steps {
+                script {
+                    // Utilisation de 'withCredentials' pour gérer de manière sécurisée le token
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                         withSonarQubeEnv(SONARQUBE) {
                             sh """
                                 sonar-scanner \
                                 -Dsonar.projectKey=myeflyer \
                                 -Dsonar.sources=. \
                                 -Dsonar.host.url=http://localhost:9000 \
-                                -Dsonar.login=${env.SONAR_TOKEN}  // Utilise ton token d'authentification
+                                -Dsonar.login=${env.SONAR_TOKEN}  // Utilisation du token sécurisé
                             """
                         }
                     }
                 }
             }
+        }
 
         stage('Quality Gate') {
-                steps {
-                    script {
-                        // Attendre que le code passe le "Quality Gate" de SonarQube
-                        timeout(time: 1, unit: 'HOURS') {
-                            waitForQualityGate()  // Attendre que l'analyse SonarQube soit validée
-                        }
+            steps {
+                script {
+                    // Attendre que le code passe le "Quality Gate" de SonarQube
+                    timeout(time: 1, unit: 'HOURS') {
+                        waitForQualityGate()  // Attendre que l'analyse SonarQube soit validée
                     }
                 }
             }
+        }
 
         stage('Push to DockerHub') {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
-                        dockerImage.push()
-                        dockerImage.push('latest') // Tag latest aussi
+                        dockerImage.push()  // Push du Docker avec le tag du build
+                        dockerImage.push('latest')  // Push du tag 'latest'
                     }
                 }
             }
@@ -79,19 +83,22 @@ pipeline {
 
         stage('Déploiement sur VM') {
             steps {
-                sh """
-                docker stop eflyer || true
-                docker rm eflyer || true
-                docker pull ${DOCKER_IMAGE}:${BUILD_NUMBER}
-                docker run -d --name eflyer -p 8001:80 ${DOCKER_IMAGE}:${BUILD_NUMBER}
-                """
+                script {
+                    // Déploiement de l'image Docker sur la VM
+                    sh """
+                    docker stop eflyer || true
+                    docker rm eflyer || true
+                    docker pull ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                    docker run -d --name eflyer -p 8001:80 ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                    """
+                }
             }
         }
     }
 
     post {
         always {
-            cleanWs()
+            cleanWs()  // Nettoyer l'espace de travail après chaque exécution
         }
     }
 }
